@@ -16,7 +16,7 @@ for more details.
 ## Example usage
 
 ```ts
-import { Reflect } from "@dx/reflect";
+import { Reflect } from '@dx/reflect';
 
 // deno-lint-ignore no-explicit-any
 type Constructor<T = unknown> = new (...args: any[]) => T;
@@ -28,8 +28,8 @@ class Example {
   constructor(a: string, b: number, c: Example) {}
 }
 
-console.log(Reflect.getMetadata("design:paramtypes", Example));
-// "[ [Function: String], [Function: Number], [Function: Example] ]"
+console.log(Reflect.getMetadata('design:paramtypes', Example));
+// '[ [Function: String], [Function: Number], [Function: Example] ]'
 ```
 
 The decorator is required for the TypeScript compiler to generate metadata for
