@@ -16,7 +16,7 @@ for more details.
 ## Example usage
 
 ```ts
-import { Reflect } from "https://deno.land/x/deno_reflect@v0.2.1/mod.ts";
+import { Reflect } from "@dx/reflect";
 
 // deno-lint-ignore no-explicit-any
 type Constructor<T = unknown> = new (...args: any[]) => T;

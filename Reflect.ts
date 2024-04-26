@@ -1,4 +1,5 @@
 // deno-lint-ignore-file ban-types no-explicit-any
+
 /**
  * This file was copied from https://github.com/rbuckton/reflect-metadata/blob/v0.1.12/Reflect.ts
  * and slightly modified to fix all type errors that Deno reported.
@@ -6,7 +7,7 @@
  * The `export` keyword was added to the `Reflect` namespace to
  * be actually able to import and use the module in Deno.
  * Additionally, the exporter function IIFE and non-exported type
- * declarationswas moved out of the `Reflect` namespace declaration,
+ * declarations was moved out of the `Reflect` namespace declaration,
  * as it would otherwise not be included in bundled files when used
  * with `deno bundle`.
  */
@@ -20,7 +21,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
 THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
+MERCHANTABILITY OR NON-INFRINGEMENT.
 
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
@@ -37,14 +38,9 @@ type MemberDecorator = <T>(
 
 const functionPrototype = Object.getPrototypeOf(Function);
 // feature test for Symbol support
-const supportsSymbol = typeof Symbol === "function";
-const toPrimitiveSymbol =
-  supportsSymbol && typeof Symbol.toPrimitive !== "undefined"
-    ? Symbol.toPrimitive
-    : "@@toPrimitive";
-const iteratorSymbol = supportsSymbol && typeof Symbol.iterator !== "undefined"
-  ? Symbol.iterator
-  : "@@iterator";
+const supportsSymbol = typeof Symbol === 'function';
+const toPrimitiveSymbol = supportsSymbol && typeof Symbol.toPrimitive !== 'undefined' ? Symbol.toPrimitive : '@@toPrimitive';
+const iteratorSymbol = supportsSymbol && typeof Symbol.iterator !== 'undefined' ? Symbol.iterator : '@@iterator';
 
 // [[Metadata]] internal slot
 // https://rbuckton.github.io/reflect-metadata/#ordinary-object-internal-methods-and-internal-slots
@@ -825,6 +821,7 @@ function OrdinaryOwnMetadataKeys(
       try {
         IteratorClose(iterator);
       } finally {
+        // deno-lint-ignore no-unsafe-finally
         throw e;
       }
     }
@@ -849,17 +846,17 @@ const enum Tag {
 function Type(x: any): Tag {
   if (x === null) return Tag.Null;
   switch (typeof x) {
-    case "undefined":
+    case 'undefined':
       return Tag.Undefined;
-    case "boolean":
+    case 'boolean':
       return Tag.Boolean;
-    case "string":
+    case 'string':
       return Tag.String;
-    case "symbol":
+    case 'symbol':
       return Tag.Symbol;
-    case "number":
+    case 'number':
       return Tag.Number;
-    case "object":
+    case 'object':
       return x === null ? Tag.Null : Tag.Object;
     default:
       return Tag.Object;
@@ -881,7 +878,7 @@ function IsNull(x: any): x is null {
 // 6.1.5 The Symbol Type
 // https://tc39.github.io/ecma262/#sec-ecmascript-language-types-symbol-type
 function IsSymbol(x: any): x is symbol {
-  return typeof x === "symbol";
+  return typeof x === 'symbol';
 }
 
 // 6.1.7 The Object Type
@@ -889,7 +886,7 @@ function IsSymbol(x: any): x is symbol {
 function IsObject<T>(
   x: T | undefined | null | boolean | string | symbol | number,
 ): x is T {
-  return typeof x === "object" ? x !== null : typeof x === "function";
+  return typeof x === 'object' ? x !== null : typeof x === 'function';
 }
 
 // 7.1 Type Conversion
@@ -915,27 +912,23 @@ function ToPrimitive(
     case Tag.Number:
       return input;
   }
-  const hint: "string" | "number" | "default" = PreferredType === Tag.String
-    ? "string"
-    : PreferredType === Tag.Number
-    ? "number"
-    : "default";
+  const hint: 'string' | 'number' | 'default' = PreferredType === Tag.String ? 'string' : PreferredType === Tag.Number ? 'number' : 'default';
   const exoticToPrim = GetMethod(input, toPrimitiveSymbol);
   if (exoticToPrim !== undefined) {
     const result = exoticToPrim.call(input, hint);
     if (IsObject(result)) throw new TypeError();
     return result;
   }
-  return OrdinaryToPrimitive(input, hint === "default" ? "number" : hint);
+  return OrdinaryToPrimitive(input, hint === 'default' ? 'number' : hint);
 }
 
 // 7.1.1.1 OrdinaryToPrimitive(O, hint)
 // https://tc39.github.io/ecma262/#sec-ordinarytoprimitive
 function OrdinaryToPrimitive(
   O: any,
-  hint: "string" | "number",
+  hint: 'string' | 'number',
 ): undefined | null | boolean | string | symbol | number {
-  if (hint === "string") {
+  if (hint === 'string') {
     const toString = O.toString;
     if (IsCallable(toString)) {
       const result = toString.call(O);
@@ -970,7 +963,7 @@ function ToBoolean(argument: any): boolean {
 // 7.1.12 ToString(argument)
 // https://tc39.github.io/ecma262/#sec-tostring
 function ToString(argument: any): string {
-  return "" + argument;
+  return '' + argument;
 }
 
 // 7.1.14 ToPropertyKey(argument)
@@ -987,25 +980,21 @@ function ToPropertyKey(argument: any): string | symbol {
 // 7.2.2 IsArray(argument)
 // https://tc39.github.io/ecma262/#sec-isarray
 function IsArray(argument: any): argument is any[] {
-  return Array.isArray
-    ? Array.isArray(argument)
-    : argument instanceof Object
-    ? argument instanceof Array
-    : Object.prototype.toString.call(argument) === "[object Array]";
+  return Array.isArray ? Array.isArray(argument) : argument instanceof Object ? argument instanceof Array : Object.prototype.toString.call(argument) === '[object Array]';
 }
 
 // 7.2.3 IsCallable(argument)
 // https://tc39.github.io/ecma262/#sec-iscallable
 function IsCallable(argument: any): argument is Function {
   // NOTE: This is an approximation as we cannot check for [[Call]] internal method.
-  return typeof argument === "function";
+  return typeof argument === 'function';
 }
 
 // 7.2.4 IsConstructor(argument)
 // https://tc39.github.io/ecma262/#sec-isconstructor
 function IsConstructor(argument: any): argument is Function {
   // NOTE: This is an approximation as we cannot check for [[Construct]] internal method.
-  return typeof argument === "function";
+  return typeof argument === 'function';
 }
 
 // 7.2.7 IsPropertyKey(argument)
@@ -1062,7 +1051,7 @@ function IteratorStep<T>(
 // 7.4.6 IteratorClose(iterator, completion)
 // https://tc39.github.io/ecma262/#sec-iteratorclose
 function IteratorClose<T>(iterator: Iterator<T>) {
-  const f = iterator["return"];
+  const f = iterator['return'];
   if (f) f.call(iterator);
 }
 
@@ -1073,7 +1062,7 @@ function IteratorClose<T>(iterator: Iterator<T>) {
 // https://tc39.github.io/ecma262/#sec-ordinarygetprototypeof
 function OrdinaryGetPrototypeOf(O: any): any {
   const proto = Object.getPrototypeOf(O);
-  if (typeof O !== "function" || O === functionPrototype) return proto;
+  if (typeof O !== 'function' || O === functionPrototype) return proto;
 
   // TypeScript doesn't set __proto__ in ES5, as it's non-standard.
   // Try to determine the superclass constructor. Compatible implementations
@@ -1094,7 +1083,7 @@ function OrdinaryGetPrototypeOf(O: any): any {
 
   // If the constructor was not a function, then we cannot determine the heritage.
   const constructor = prototypeProto.constructor;
-  if (typeof constructor !== "function") return proto;
+  if (typeof constructor !== 'function') return proto;
 
   // If we have some kind of self-reference, then we cannot determine the heritage.
   if (constructor === O) return proto;

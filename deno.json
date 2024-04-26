@@ -1,0 +1,41 @@
+{
+  "name": "@dx/reflect",
+  "version": "0.2.2",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "tasks": {
+    "lock": "deno cache --lock=deno.lock --lock-write ./mod.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo",
+        "no-deprecated-deno-api"
+      ],
+      "exclude": [
+        "no-explicit-any",
+        "no-inferrable-types"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 360,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "exclude": [
+      ".vscode/**"
+    ]
+  }
+}
