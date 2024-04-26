@@ -178,7 +178,7 @@ export function decorate(
  *         method() { }
  *     }
  */
-export function metadata(metadataKey: any, metadataValue: any) {
+export function metadata(metadataKey: any, metadataValue: any): Function {
   function decorator(target: Function): void;
   function decorator(target: any, propertyKey: string | symbol): void;
   function decorator(target: any, propertyKey?: string | symbol): void {
