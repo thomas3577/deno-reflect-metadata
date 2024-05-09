@@ -1,5 +1,9 @@
 # Metadata Reflection API for Deno
 
+[![JSR Version](https://jsr.io/badges/@dx/reflect)](https://jsr.io/@dx/reflect)
+[![JSR Score](https://jsr.io/badges/@dx/reflect/score)](https://jsr.io/@dx/reflect/score)
+[![ci](https://github.com/thomas3577/deno-reflect-metadata/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/deno-reflect-metadata/actions/workflows/deno.yml)
+
 This is a fork of [jiawei397/deno-reflect-metadata](https://github.com/jiawei397/deno-reflect-metadata)
 
 This is a copy of the
