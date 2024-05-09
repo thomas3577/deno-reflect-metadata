@@ -1,10 +1,8 @@
 # Metadata Reflection API for Deno
 
-> This project just fix the bundled
-> [error](https://github.com/cmd-johnson/deno-reflect-metadata/pull/7) which
-> caused by order.
+This is a fork of [jiawei397/deno-reflect-metadata](https://github.com/jiawei397/deno-reflect-metadata)
 
-This is a direct copy of the
+This is a copy of the
 [Metadata Reflection API by Microsoft](https://github.com/rbuckton/reflect-metadata)
 with
 [slight changes](https://github.com/cmd-johnson/deno-reflect-metadata/commit/a39666813eb7e8b38fe563f275085b60f044af7e)
@@ -16,20 +14,23 @@ for more details.
 ## Example usage
 
 ```ts
-import { Reflect } from '@dx/reflect';
+type ClassConstructor<T = unknown> = new (...args: any[]) => T;
 
-// deno-lint-ignore no-explicit-any
-type Constructor<T = unknown> = new (...args: any[]) => T;
-
-function decorator<T>(_: Constructor<T>): void {}
-
-@decorator
-class Example {
-  constructor(a: string, b: number, c: Example) {}
+function Decorator<T>() {
+  return (_: ClassConstructor<T>): void => {};
 }
 
-console.log(Reflect.getMetadata('design:paramtypes', Example));
-// '[ [Function: String], [Function: Number], [Function: Example] ]'
+class ClassA {}
+
+@Decorator()
+class ClassB {
+  constructor(a: string, b: number, c: ClassA) {}
+}
+
+const metadata = Reflect.getMetadata('design:paramtypes', ClassB);
+
+console.log(metadata?.map((x: ClassConstructor) => x.name).join(', '));
+// "String, Number, ClassA"
 ```
 
 The decorator is required for the TypeScript compiler to generate metadata for

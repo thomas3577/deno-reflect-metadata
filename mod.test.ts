@@ -1,5 +1,4 @@
-// run with `deno run example.ts`
-
+import { assertEquals } from '@std/assert';
 import { Reflect } from './mod.ts';
 
 type ClassConstructor<T = unknown> = new (...args: any[]) => T;
@@ -17,6 +16,9 @@ class ClassB {
   constructor(a: string, b: number, c: ClassA) {}
 }
 
-const metadata = Reflect.getMetadata('design:paramtypes', ClassB);
+Deno.test('Returns "String, Number, ClassA"', () => {
+  const metadata = Reflect.getMetadata('design:paramtypes', ClassB);
+  const actual = metadata?.map((x: ClassConstructor) => x.name).join(', ');
 
-console.log(metadata?.map((x: ClassConstructor) => x.name).join(', ')); // "String, Number, ClassA"
+  assertEquals(actual, 'String, Number, ClassA');
+});
