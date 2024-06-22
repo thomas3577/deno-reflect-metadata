@@ -1,6 +1,6 @@
 {
   "name": "@dx/reflect",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "exports": {
     ".": "./mod.ts"
   },
@@ -14,7 +14,7 @@
     "strictPropertyInitialization": false
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@0.224"
+    "@std/assert": "jsr:@std/assert@0.226"
   },
   "publish": {
     "exclude": [
