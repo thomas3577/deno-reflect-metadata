@@ -30,11 +30,7 @@ and limitations under the License.
 // Metadata Proposal
 // https://rbuckton.github.io/reflect-metadata/
 
-type MemberDecorator = <T>(
-  target: Object,
-  propertyKey: string | symbol,
-  descriptor?: TypedPropertyDescriptor<T>,
-) => TypedPropertyDescriptor<T> | void;
+type MemberDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor?: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
 
 const functionPrototype = Object.getPrototypeOf(Function);
 // feature test for Symbol support
@@ -44,27 +40,7 @@ const iteratorSymbol = supportsSymbol && typeof Symbol.iterator !== 'undefined' 
 
 // [[Metadata]] internal slot
 // https://rbuckton.github.io/reflect-metadata/#ordinary-object-internal-methods-and-internal-slots
-const Metadata = new WeakMap<
-  any,
-  Map<string | symbol | undefined, Map<any, any>>
->();
-
-export function decorate(
-  decorators: ClassDecorator[],
-  target: Function,
-): Function;
-export function decorate(
-  decorators: (PropertyDecorator | MethodDecorator)[],
-  target: any,
-  propertyKey: string | symbol,
-  attributes?: PropertyDescriptor | null,
-): PropertyDescriptor | undefined;
-export function decorate(
-  decorators: (PropertyDecorator | MethodDecorator)[],
-  target: any,
-  propertyKey: string | symbol,
-  attributes: PropertyDescriptor,
-): PropertyDescriptor;
+const Metadata = new WeakMap<any, Map<string | symbol | undefined, Map<any, any>>>();
 
 /**
  * Applies a set of decorators to a property of a target object.
@@ -104,12 +80,10 @@ export function decorate(
  *         Reflect.decorate(decoratorsArray, Example.prototype, "method",
  *             Object.getOwnPropertyDescriptor(Example.prototype, "method")));
  */
-export function decorate(
-  decorators: (ClassDecorator | MemberDecorator | MethodDecorator)[],
-  target: any,
-  propertyKey?: string | symbol,
-  attributes?: PropertyDescriptor | null,
-): PropertyDescriptor | Function | undefined {
+export function decorate(decorators: ClassDecorator[], target: Function): Function;
+export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | undefined;
+export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes: PropertyDescriptor): PropertyDescriptor;
+export function decorate(decorators: (ClassDecorator | MemberDecorator | MethodDecorator)[], target: any, propertyKey?: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | Function | undefined {
   if (!IsUndefined(propertyKey)) {
     if (!IsArray(decorators)) throw new TypeError();
     if (!IsObject(target)) throw new TypeError();
@@ -194,18 +168,6 @@ export function metadata(metadataKey: any, metadataValue: any): Function {
 // 4.1.3 Reflect.defineMetadata(metadataKey, metadataValue, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect.definemetadata
 
-export function defineMetadata(
-  metadataKey: any,
-  metadataValue: any,
-  target: any,
-): void;
-export function defineMetadata(
-  metadataKey: any,
-  metadataValue: any,
-  target: any,
-  propertyKey: string | symbol,
-): void;
-
 /**
  * Define a unique metadata entry on the target.
  * @param metadataKey A key used to store and retrieve metadata.
@@ -244,12 +206,9 @@ export function defineMetadata(
  *         return (target, key?) => Reflect.defineMetadata("custom:annotation", options, target, key);
  *     }
  */
-export function defineMetadata(
-  metadataKey: any,
-  metadataValue: any,
-  target: any,
-  propertyKey?: string | symbol,
-): void {
+export function defineMetadata(metadataKey: any, metadataValue: any, target: any): void;
+export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey: string | symbol): void;
+export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey?: string | symbol): void {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryDefineOwnMetadata(
@@ -262,13 +221,6 @@ export function defineMetadata(
 
 // 4.1.4 Reflect.hasMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect.hasmetadata
-
-export function hasMetadata(metadataKey: any, target: any): boolean;
-export function hasMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey: string | symbol,
-): boolean;
 
 /**
  * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
@@ -303,11 +255,9 @@ export function hasMetadata(
  *     // method (on prototype)
  *     result = Reflect.hasMetadata("custom:annotation", Example.prototype, "method");
  */
-export function hasMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey?: string | symbol,
-): boolean {
+export function hasMetadata(metadataKey: any, target: any): boolean;
+export function hasMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
+export function hasMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryHasMetadata(metadataKey, target, propertyKey);
@@ -315,13 +265,6 @@ export function hasMetadata(
 
 // 4.1.5 Reflect.hasOwnMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-hasownmetadata
-
-export function hasOwnMetadata(metadataKey: any, target: any): boolean;
-export function hasOwnMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey: string | symbol,
-): boolean;
 
 /**
  * Gets a value indicating whether the target object has the provided metadata key defined.
@@ -356,11 +299,9 @@ export function hasOwnMetadata(
  *     // method (on prototype)
  *     result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "method");
  */
-export function hasOwnMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey?: string | symbol,
-): boolean {
+export function hasOwnMetadata(metadataKey: any, target: any): boolean;
+export function hasOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
+export function hasOwnMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryHasOwnMetadata(metadataKey, target, propertyKey);
@@ -368,13 +309,6 @@ export function hasOwnMetadata(
 
 // 4.1.6 Reflect.getMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getmetadata
-
-export function getMetadata(metadataKey: any, target: any): any;
-export function getMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey: string | symbol,
-): any;
 
 /**
  * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
@@ -409,11 +343,9 @@ export function getMetadata(
  *     // method (on prototype)
  *     result = Reflect.getMetadata("custom:annotation", Example.prototype, "method");
  */
-export function getMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey?: string | symbol,
-): any {
+export function getMetadata(metadataKey: any, target: any): any;
+export function getMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
+export function getMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): any {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryGetMetadata(metadataKey, target, propertyKey);
@@ -421,13 +353,6 @@ export function getMetadata(
 
 // 4.1.7 Reflect.getOwnMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getownmetadata
-
-export function getOwnMetadata(metadataKey: any, target: any): any;
-export function getOwnMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey: string | symbol,
-): any;
 
 /**
  * Gets the metadata value for the provided metadata key on the target object.
@@ -462,11 +387,9 @@ export function getOwnMetadata(
  *     // method (on prototype)
  *     result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "method");
  */
-export function getOwnMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey?: string | symbol,
-): any {
+export function getOwnMetadata(metadataKey: any, target: any): any;
+export function getOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
+export function getOwnMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): any {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryGetOwnMetadata(metadataKey, target, propertyKey);
@@ -474,12 +397,6 @@ export function getOwnMetadata(
 
 // 4.1.8 Reflect.getMetadataKeys(target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getmetadatakeys
-
-export function getMetadataKeys(target: any): any[];
-export function getMetadataKeys(
-  target: any,
-  propertyKey: string | symbol,
-): any[];
 
 /**
  * Gets the metadata keys defined on the target object or its prototype chain.
@@ -513,10 +430,9 @@ export function getMetadataKeys(
  *     // method (on prototype)
  *     result = Reflect.getMetadataKeys(Example.prototype, "method");
  */
-export function getMetadataKeys(
-  target: any,
-  propertyKey?: string | symbol,
-): any[] {
+export function getMetadataKeys(target: any): any[];
+export function getMetadataKeys(target: any, propertyKey: string | symbol): any[];
+export function getMetadataKeys(target: any, propertyKey?: string | symbol): any[] {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryMetadataKeys(target, propertyKey);
@@ -524,12 +440,6 @@ export function getMetadataKeys(
 
 // 4.1.9 Reflect.getOwnMetadataKeys(target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getownmetadata
-
-export function getOwnMetadataKeys(target: any): any[];
-export function getOwnMetadataKeys(
-  target: any,
-  propertyKey: string | symbol,
-): any[];
 
 /**
  * Gets the unique metadata keys defined on the target object.
@@ -563,10 +473,9 @@ export function getOwnMetadataKeys(
  *     // method (on prototype)
  *     result = Reflect.getOwnMetadataKeys(Example.prototype, "method");
  */
-export function getOwnMetadataKeys(
-  target: any,
-  propertyKey?: string | symbol,
-): any[] {
+export function getOwnMetadataKeys(target: any): any[];
+export function getOwnMetadataKeys(target: any, propertyKey: string | symbol): any[];
+export function getOwnMetadataKeys(target: any, propertyKey?: string | symbol): any[] {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   return OrdinaryOwnMetadataKeys(target, propertyKey);
@@ -574,13 +483,6 @@ export function getOwnMetadataKeys(
 
 // 4.1.10 Reflect.deleteMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-deletemetadata
-
-export function deleteMetadata(metadataKey: any, target: any): boolean;
-export function deleteMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey: string | symbol,
-): boolean;
 
 /**
  * Deletes the metadata entry from the target object with the provided key.
@@ -615,11 +517,9 @@ export function deleteMetadata(
  *     // method (on prototype)
  *     result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "method");
  */
-export function deleteMetadata(
-  metadataKey: any,
-  target: any,
-  propertyKey?: string | symbol,
-): boolean {
+export function deleteMetadata(metadataKey: any, target: any): boolean;
+export function deleteMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
+export function deleteMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
   const metadataMap = GetOrCreateMetadataMap(
@@ -1070,7 +970,7 @@ function OrdinaryGetPrototypeOf(O: any): any {
   // or ensure each class has a valid `constructor` property on its prototype that
   // points back to the constructor.
 
-  // If this is not the same as Function.[[Prototype]], then this is definately inherited.
+  // If this is not the same as Function.[[Prototype]], then this is definitely inherited.
   // This is the case when in ES6 or when using __proto__ in a compatible browser.
   if (proto !== functionPrototype) return proto;
 
