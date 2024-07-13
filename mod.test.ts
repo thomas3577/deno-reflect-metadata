@@ -1,6 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { Reflect } from './mod.ts';
 
+// deno-lint-ignore no-explicit-any
 type ClassConstructor<T = unknown> = new (...args: any[]) => T;
 
 function Decorator<T>() {

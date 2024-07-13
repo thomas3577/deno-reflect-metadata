@@ -1,6 +1,6 @@
 {
   "name": "@dx/reflect",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "exports": {
     ".": "./mod.ts"
   },
@@ -25,18 +25,6 @@
       "deno.lock",
       "**/*.test.ts"
     ]
-  },
-  "lint": {
-    "rules": {
-      "include": [
-        "ban-untagged-todo",
-        "no-deprecated-deno-api"
-      ],
-      "exclude": [
-        "no-explicit-any",
-        "no-inferrable-types"
-      ]
-    }
   },
   "fmt": {
     "useTabs": false,
