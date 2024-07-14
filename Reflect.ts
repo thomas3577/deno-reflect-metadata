@@ -10,6 +10,8 @@
  * declarations was moved out of the `Reflect` namespace declaration,
  * as it would otherwise not be included in bundled files when used
  * with `deno bundle`.
+ *
+ * @module
  */
 
 /*! *****************************************************************************
