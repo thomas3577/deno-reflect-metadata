@@ -45,10 +45,46 @@ const Metadata = new WeakMap<any, Map<string | symbol | undefined, Map<any, any>
 /**
  * Applies a set of decorators to a property of a target object.
  *
- * @param decorators - An array of decorators.
- * @param target - The target object.
- * @param propertyKey - (Optional) The property key to decorate.
- * @param attributes - (Optional) The property descriptor for the target key.
+ * @param {(ClassDecorator | MemberDecorator | MethodDecorator)[]} decorators - An array of decorators.
+ * @param {any} target - The target object.
+ *
+ * @returns {Function} - The result of applying the decorators to the target.
+ */
+export function decorate(decorators: ClassDecorator[], target: Function): Function;
+
+/**
+ * Applies a set of decorators to a property of a target object.
+ *
+ * @param {(ClassDecorator | MemberDecorator | MethodDecorator)[]} decorators - An array of decorators.
+ * @param {any} target - The target object.
+ * @param {string | symbol} propertyKey - The property key to decorate.
+ * @param {PropertyDescriptor | null} [attributes] - (Optional) The property descriptor for the target key.
+ *
+ * @returns {PropertyDescriptor | undefined} - The result of applying the decorators to the target.
+ */
+export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | undefined;
+
+/**
+ * Applies a set of decorators to a property of a target object.
+ *
+ * @param {(ClassDecorator | MemberDecorator | MethodDecorator)[]} decorators - An array of decorators.
+ * @param {any} target - The target object.
+ * @param {string | symbol} propertyKey - The property key to decorate.
+ * @param {PropertyDescriptor} attributes - The property descriptor for the target key.
+ *
+ * @returns {PropertyDescriptor} - The result of applying the decorators to the target.
+ */
+export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes: PropertyDescriptor): PropertyDescriptor;
+
+/**
+ * Applies a set of decorators to a property of a target object.
+ *
+ * @param {(ClassDecorator | MemberDecorator | MethodDecorator)[]} decorators - An array of decorators.
+ * @param {any} target - The target object.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key to decorate.
+ * @param {PropertyDescriptor | null} [attributes] - (Optional) The property descriptor for the target key.
+ *
+ * @returns {PropertyDescriptor | Function | undefined} - The result of applying the decorators to the target.
  *
  * @remarks Decorators are applied in reverse order.
  *
@@ -86,9 +122,6 @@ const Metadata = new WeakMap<any, Map<string | symbol | undefined, Map<any, any>
  * );
  * ```
  */
-export function decorate(decorators: ClassDecorator[], target: Function): Function;
-export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | undefined;
-export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes: PropertyDescriptor): PropertyDescriptor;
 export function decorate(decorators: (ClassDecorator | MemberDecorator | MethodDecorator)[], target: any, propertyKey?: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | Function | undefined {
   if (!IsUndefined(propertyKey)) {
     if (!IsArray(decorators)) throw new TypeError();
@@ -184,6 +217,25 @@ export function metadata(metadataKey: any, metadataValue: any): Function {
  * @param {any} metadataKey - A key used to store and retrieve metadata.
  * @param {any} metadataValue - A value that contains attached metadata.
  * @param {any} target - The target object on which to define metadata.
+ */
+export function defineMetadata(metadataKey: any, metadataValue: any, target: any): void;
+
+/**
+ * Define a unique metadata entry on the target.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} metadataValue - A value that contains attached metadata.
+ * @param {any} target - The target object on which to define metadata.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ */
+export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey: string | symbol): void;
+
+/**
+ * Define a unique metadata entry on the target.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} metadataValue - A value that contains attached metadata.
+ * @param {any} target - The target object on which to define metadata.
  * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
  *
  * @example
@@ -219,8 +271,6 @@ export function metadata(metadataKey: any, metadataValue: any): Function {
  * }
  * ```
  */
-export function defineMetadata(metadataKey: any, metadataValue: any, target: any): void;
-export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey: string | symbol): void;
 export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey?: string | symbol): void {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -234,6 +284,27 @@ export function defineMetadata(metadataKey: any, metadataValue: any, target: any
 
 // 4.1.4 Reflect.hasMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect.hasmetadata
+
+/**
+ * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object or its prototype chain; otherwise, `false`.
+ */
+export function hasMetadata(metadataKey: any, target: any): boolean;
+
+/**
+ * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object or its prototype chain; otherwise, `false`.
+ */
+export function hasMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 
 /**
  * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
@@ -272,8 +343,6 @@ export function defineMetadata(metadataKey: any, metadataValue: any, target: any
  * result = Reflect.hasMetadata("custom:annotation", Example.prototype, "method");
  * ```
  */
-export function hasMetadata(metadataKey: any, target: any): boolean;
-export function hasMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 export function hasMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -282,6 +351,27 @@ export function hasMetadata(metadataKey: any, target: any, propertyKey?: string 
 
 // 4.1.5 Reflect.hasOwnMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-hasownmetadata
+
+/**
+ * Gets a value indicating whether the target object has the provided metadata key defined.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object; otherwise, `false`.
+ */
+export function hasOwnMetadata(metadataKey: any, target: any): boolean;
+
+/**
+ * Gets a value indicating whether the target object has the provided metadata key defined.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object; otherwise, `false`.
+ */
+export function hasOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 
 /**
  * Gets a value indicating whether the target object has the provided metadata key defined.
@@ -320,8 +410,6 @@ export function hasMetadata(metadataKey: any, target: any, propertyKey?: string 
  * result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "method");
  * ```
  */
-export function hasOwnMetadata(metadataKey: any, target: any): boolean;
-export function hasOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 export function hasOwnMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -330,6 +418,27 @@ export function hasOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
 
 // 4.1.6 Reflect.getMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getmetadata
+
+/**
+ * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ */
+export function getMetadata(metadataKey: any, target: any): any;
+
+/**
+ * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ */
+export function getMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
 
 /**
  * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
@@ -368,8 +477,6 @@ export function hasOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
  * result = Reflect.getMetadata("custom:annotation", Example.prototype, "method");
  * ```
  */
-export function getMetadata(metadataKey: any, target: any): any;
-export function getMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
 export function getMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): any {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -378,6 +485,27 @@ export function getMetadata(metadataKey: any, target: any, propertyKey?: string 
 
 // 4.1.7 Reflect.getOwnMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getownmetadata
+
+/**
+ * Gets the metadata value for the provided metadata key on the target object.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ */
+export function getOwnMetadata(metadataKey: any, target: any): any;
+
+/**
+ * Gets the metadata value for the provided metadata key on the target object.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ */
+export function getOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
 
 /**
  * Gets the metadata value for the provided metadata key on the target object.
@@ -416,8 +544,6 @@ export function getMetadata(metadataKey: any, target: any, propertyKey?: string 
  * result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "method");
  * ```
  */
-export function getOwnMetadata(metadataKey: any, target: any): any;
-export function getOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
 export function getOwnMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): any {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -426,6 +552,25 @@ export function getOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
 
 // 4.1.8 Reflect.getMetadataKeys(target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getmetadatakeys
+
+/**
+ * Gets the metadata keys defined on the target object or its prototype chain.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {any[]} - An array of unique metadata keys.
+ */
+export function getMetadataKeys(target: any): any[];
+
+/**
+ * Gets the metadata keys defined on the target object or its prototype chain.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {any[]} - An array of unique metadata keys.
+ */
+export function getMetadataKeys(target: any, propertyKey: string | symbol): any[];
 
 /**
  * Gets the metadata keys defined on the target object or its prototype chain.
@@ -463,8 +608,6 @@ export function getOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
  * result = Reflect.getMetadataKeys(Example.prototype, "method");
  * ```
  */
-export function getMetadataKeys(target: any): any[];
-export function getMetadataKeys(target: any, propertyKey: string | symbol): any[];
 export function getMetadataKeys(target: any, propertyKey?: string | symbol): any[] {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -473,6 +616,25 @@ export function getMetadataKeys(target: any, propertyKey?: string | symbol): any
 
 // 4.1.9 Reflect.getOwnMetadataKeys(target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-getownmetadata
+
+/**
+ * Gets the unique metadata keys defined on the target object.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {any[]} An array of unique metadata keys.
+ */
+export function getOwnMetadataKeys(target: any): any[];
+
+/**
+ * Gets the unique metadata keys defined on the target object.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {any[]} An array of unique metadata keys.
+ */
+export function getOwnMetadataKeys(target: any, propertyKey: string | symbol): any[];
 
 /**
  * Gets the unique metadata keys defined on the target object.
@@ -510,8 +672,6 @@ export function getMetadataKeys(target: any, propertyKey?: string | symbol): any
  * result = Reflect.getOwnMetadataKeys(Example.prototype, "method");
  * ```
  */
-export function getOwnMetadataKeys(target: any): any[];
-export function getOwnMetadataKeys(target: any, propertyKey: string | symbol): any[];
 export function getOwnMetadataKeys(target: any, propertyKey?: string | symbol): any[] {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
@@ -520,6 +680,27 @@ export function getOwnMetadataKeys(target: any, propertyKey?: string | symbol): 
 
 // 4.1.10 Reflect.deleteMetadata(metadataKey, target [, propertyKey])
 // https://rbuckton.github.io/reflect-metadata/#reflect-deletemetadata
+
+/**
+ * Deletes the metadata entry from the target object with the provided key.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ *
+ * @returns {boolean} - `true` if the metadata entry was found and deleted; otherwise, false.
+ */
+export function deleteMetadata(metadataKey: any, target: any): boolean;
+
+/**
+ * Deletes the metadata entry from the target object with the provided key.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} propertyKey - The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata entry was found and deleted; otherwise, false.
+ */
+export function deleteMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 
 /**
  * Deletes the metadata entry from the target object with the provided key.
@@ -558,8 +739,6 @@ export function getOwnMetadataKeys(target: any, propertyKey?: string | symbol): 
  * result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "method");
  * ```
  */
-export function deleteMetadata(metadataKey: any, target: any): boolean;
-export function deleteMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
 export function deleteMetadata(metadataKey: any, target: any, propertyKey?: string | symbol): boolean {
   if (!IsObject(target)) throw new TypeError();
   if (!IsUndefined(propertyKey)) propertyKey = ToPropertyKey(propertyKey);
