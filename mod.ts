@@ -1,9 +1,3 @@
-/**
- * This is the initial module of @dx/inject.
- *
- * @module
- */
-
 import * as ref from './Reflect.ts';
 
 for (const key in ref) {

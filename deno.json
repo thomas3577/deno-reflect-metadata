@@ -1,6 +1,6 @@
 {
   "name": "@dx/reflect",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "exports": {
     ".": "./mod.ts"
   },
@@ -23,7 +23,8 @@
       ".gitignore",
       ".editorconfig",
       "deno.lock",
-      "**/*.test.ts"
+      "**/*.test.ts",
+      "example.ts"
     ]
   },
   "fmt": {
