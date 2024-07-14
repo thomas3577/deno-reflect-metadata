@@ -30,7 +30,7 @@ and limitations under the License.
 // Metadata Proposal
 // https://rbuckton.github.io/reflect-metadata/
 
-type MemberDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor?: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+type MemberDecorator = <T>(target: object, propertyKey: string | symbol, descriptor?: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
 
 const functionPrototype = Object.getPrototypeOf(Function);
 // feature test for Symbol support
@@ -44,41 +44,47 @@ const Metadata = new WeakMap<any, Map<string | symbol | undefined, Map<any, any>
 
 /**
  * Applies a set of decorators to a property of a target object.
- * @param decorators An array of decorators.
- * @param target The target object.
- * @param propertyKey (Optional) The property key to decorate.
- * @param attributes (Optional) The property descriptor for the target key.
+ *
+ * @param decorators - An array of decorators.
+ * @param target - The target object.
+ * @param propertyKey - (Optional) The property key to decorate.
+ * @param attributes - (Optional) The property descriptor for the target key.
+ *
  * @remarks Decorators are applied in reverse order.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * Example = Reflect.decorate(decoratorsArray, Example);
  *
- *     // constructor
- *     Example = Reflect.decorate(decoratorsArray, Example);
+ * // property (on constructor)
+ * Reflect.decorate(decoratorsArray, Example, "staticProperty");
  *
- *     // property (on constructor)
- *     Reflect.decorate(decoratorsArray, Example, "staticProperty");
+ * // property (on prototype)
+ * Reflect.decorate(decoratorsArray, Example.prototype, "property");
  *
- *     // property (on prototype)
- *     Reflect.decorate(decoratorsArray, Example.prototype, "property");
+ * // method (on constructor)
+ * Object.defineProperty(Example, "staticMethod",
+ *   Reflect.decorate(decoratorsArray, Example, "staticMethod",
+ *   Object.getOwnPropertyDescriptor(Example, "staticMethod"))
+ * );
  *
- *     // method (on constructor)
- *     Object.defineProperty(Example, "staticMethod",
- *         Reflect.decorate(decoratorsArray, Example, "staticMethod",
- *             Object.getOwnPropertyDescriptor(Example, "staticMethod")));
- *
- *     // method (on prototype)
- *     Object.defineProperty(Example.prototype, "method",
- *         Reflect.decorate(decoratorsArray, Example.prototype, "method",
- *             Object.getOwnPropertyDescriptor(Example.prototype, "method")));
+ * // method (on prototype)
+ * Object.defineProperty(Example.prototype, "method",
+ *   Reflect.decorate(decoratorsArray, Example.prototype, "method",
+ *   Object.getOwnPropertyDescriptor(Example.prototype, "method"))
+ * );
+ * ```
  */
 export function decorate(decorators: ClassDecorator[], target: Function): Function;
 export function decorate(decorators: (PropertyDecorator | MethodDecorator)[], target: any, propertyKey: string | symbol, attributes?: PropertyDescriptor | null): PropertyDescriptor | undefined;
@@ -115,42 +121,46 @@ export function decorate(decorators: (ClassDecorator | MemberDecorator | MethodD
 
 /**
  * A default metadata decorator factory that can be used on a class, class member, or parameter.
- * @param metadataKey The key for the metadata entry.
- * @param metadataValue The value for the metadata entry.
- * @returns A decorator function.
+ *
+ * @param {any} metadataKey - The key for the metadata entry.
+ * @param {any} metadataValue - The value for the metadata entry.
+ *
+ * @returns {Function} - A decorator function.
+ *
  * @remarks
  * If `metadataKey` is already defined for the target and target key, the
  * metadataValue for that key will be overwritten.
+ *
  * @example
+ * ```ts
+ * // constructor
+ * @Reflect.metadata(key, value)
+ * class Example { }
  *
- *     // constructor
- *     @Reflect.metadata(key, value)
- *     class Example {
- *     }
+ * // property (on constructor, TypeScript only)
+ * class Example {
+ *   @Reflect.metadata(key, value)
+ *   static staticProperty;
+ * }
  *
- *     // property (on constructor, TypeScript only)
- *     class Example {
- *         @Reflect.metadata(key, value)
- *         static staticProperty;
- *     }
+ * // property (on prototype, TypeScript only)
+ * class Example {
+ *   @Reflect.metadata(key, value)
+ *   property;
+ * }
  *
- *     // property (on prototype, TypeScript only)
- *     class Example {
- *         @Reflect.metadata(key, value)
- *         property;
- *     }
+ * // method (on constructor)
+ * class Example {
+ *   @Reflect.metadata(key, value)
+ *   static staticMethod() { }
+ * }
  *
- *     // method (on constructor)
- *     class Example {
- *         @Reflect.metadata(key, value)
- *         static staticMethod() { }
- *     }
- *
- *     // method (on prototype)
- *     class Example {
- *         @Reflect.metadata(key, value)
- *         method() { }
- *     }
+ * // method (on prototype)
+ * class Example {
+ *   @Reflect.metadata(key, value)
+ *   method() { }
+ * }
+ * ```
  */
 export function metadata(metadataKey: any, metadataValue: any): Function {
   function decorator(target: Function): void;
@@ -170,41 +180,44 @@ export function metadata(metadataKey: any, metadataValue: any): Function {
 
 /**
  * Define a unique metadata entry on the target.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param metadataValue A value that contains attached metadata.
- * @param target The target object on which to define metadata.
- * @param propertyKey (Optional) The property key for the target.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} metadataValue - A value that contains attached metadata.
+ * @param {any} target - The target object on which to define metadata.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * Reflect.defineMetadata("custom:annotation", options, Example);
  *
- *     // constructor
- *     Reflect.defineMetadata("custom:annotation", options, Example);
+ * // property (on constructor)
+ * Reflect.defineMetadata("custom:annotation", options, Example, "staticProperty");
  *
- *     // property (on constructor)
- *     Reflect.defineMetadata("custom:annotation", options, Example, "staticProperty");
+ * // property (on prototype)
+ * Reflect.defineMetadata("custom:annotation", options, Example.prototype, "property");
  *
- *     // property (on prototype)
- *     Reflect.defineMetadata("custom:annotation", options, Example.prototype, "property");
+ * // method (on constructor)
+ * Reflect.defineMetadata("custom:annotation", options, Example, "staticMethod");
  *
- *     // method (on constructor)
- *     Reflect.defineMetadata("custom:annotation", options, Example, "staticMethod");
+ * // method (on prototype)
+ * Reflect.defineMetadata("custom:annotation", options, Example.prototype, "method");
  *
- *     // method (on prototype)
- *     Reflect.defineMetadata("custom:annotation", options, Example.prototype, "method");
- *
- *     // decorator factory as metadata-producing annotation.
- *     function MyAnnotation(options): Decorator {
- *         return (target, key?) => Reflect.defineMetadata("custom:annotation", options, target, key);
- *     }
+ * // decorator factory as metadata-producing annotation.
+ * function MyAnnotation(options): Decorator {
+ *   return (target, key?) => Reflect.defineMetadata("custom:annotation", options, target, key);
+ * }
+ * ```
  */
 export function defineMetadata(metadataKey: any, metadataValue: any, target: any): void;
 export function defineMetadata(metadataKey: any, metadataValue: any, target: any, propertyKey: string | symbol): void;
@@ -224,36 +237,40 @@ export function defineMetadata(metadataKey: any, metadataValue: any, target: any
 
 /**
  * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns `true` if the metadata key was defined on the target object or its prototype chain; otherwise, `false`.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object or its prototype chain; otherwise, `false`.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.hasMetadata("custom:annotation", Example);
  *
- *     // constructor
- *     result = Reflect.hasMetadata("custom:annotation", Example);
+ * // property (on constructor)
+ * result = Reflect.hasMetadata("custom:annotation", Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.hasMetadata("custom:annotation", Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.hasMetadata("custom:annotation", Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.hasMetadata("custom:annotation", Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.hasMetadata("custom:annotation", Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.hasMetadata("custom:annotation", Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.hasMetadata("custom:annotation", Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.hasMetadata("custom:annotation", Example.prototype, "method");
+ * ```
  */
 export function hasMetadata(metadataKey: any, target: any): boolean;
 export function hasMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
@@ -268,36 +285,40 @@ export function hasMetadata(metadataKey: any, target: any, propertyKey?: string 
 
 /**
  * Gets a value indicating whether the target object has the provided metadata key defined.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns `true` if the metadata key was defined on the target object; otherwise, `false`.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata key was defined on the target object; otherwise, `false`.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.hasOwnMetadata("custom:annotation", Example);
  *
- *     // constructor
- *     result = Reflect.hasOwnMetadata("custom:annotation", Example);
+ * // property (on constructor)
+ * result = Reflect.hasOwnMetadata("custom:annotation", Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.hasOwnMetadata("custom:annotation", Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.hasOwnMetadata("custom:annotation", Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.hasOwnMetadata("custom:annotation", Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.hasOwnMetadata("custom:annotation", Example.prototype, "method");
+ * ```
  */
 export function hasOwnMetadata(metadataKey: any, target: any): boolean;
 export function hasOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;
@@ -312,36 +333,40 @@ export function hasOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
 
 /**
  * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.getMetadata("custom:annotation", Example);
  *
- *     // constructor
- *     result = Reflect.getMetadata("custom:annotation", Example);
+ * // property (on constructor)
+ * result = Reflect.getMetadata("custom:annotation", Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.getMetadata("custom:annotation", Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.getMetadata("custom:annotation", Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.getMetadata("custom:annotation", Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.getMetadata("custom:annotation", Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.getMetadata("custom:annotation", Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.getMetadata("custom:annotation", Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.getMetadata("custom:annotation", Example.prototype, "method");
+ * ```
  */
 export function getMetadata(metadataKey: any, target: any): any;
 export function getMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
@@ -356,36 +381,40 @@ export function getMetadata(metadataKey: any, target: any, propertyKey?: string 
 
 /**
  * Gets the metadata value for the provided metadata key on the target object.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {any} - The metadata value for the metadata key if found; otherwise, `undefined`.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.getOwnMetadata("custom:annotation", Example);
  *
- *     // constructor
- *     result = Reflect.getOwnMetadata("custom:annotation", Example);
+ * // property (on constructor)
+ * result = Reflect.getOwnMetadata("custom:annotation", Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.getOwnMetadata("custom:annotation", Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.getOwnMetadata("custom:annotation", Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.getOwnMetadata("custom:annotation", Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.getOwnMetadata("custom:annotation", Example.prototype, "method");
+ * ```
  */
 export function getOwnMetadata(metadataKey: any, target: any): any;
 export function getOwnMetadata(metadataKey: any, target: any, propertyKey: string | symbol): any;
@@ -400,35 +429,39 @@ export function getOwnMetadata(metadataKey: any, target: any, propertyKey?: stri
 
 /**
  * Gets the metadata keys defined on the target object or its prototype chain.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns An array of unique metadata keys.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {any[]} - An array of unique metadata keys.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.getMetadataKeys(Example);
  *
- *     // constructor
- *     result = Reflect.getMetadataKeys(Example);
+ * // property (on constructor)
+ * result = Reflect.getMetadataKeys(Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.getMetadataKeys(Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.getMetadataKeys(Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.getMetadataKeys(Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.getMetadataKeys(Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.getMetadataKeys(Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.getMetadataKeys(Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.getMetadataKeys(Example.prototype, "method");
+ * ```
  */
 export function getMetadataKeys(target: any): any[];
 export function getMetadataKeys(target: any, propertyKey: string | symbol): any[];
@@ -443,35 +476,39 @@ export function getMetadataKeys(target: any, propertyKey?: string | symbol): any
 
 /**
  * Gets the unique metadata keys defined on the target object.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns An array of unique metadata keys.
+ *
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {any[]} An array of unique metadata keys.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *   // property declarations are not part of ES6, though they are valid in TypeScript:
+ *   // static staticProperty;
+ *   // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *   constructor(p) { }
+ *   static staticMethod(p) { }
+ *   method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.getOwnMetadataKeys(Example);
  *
- *     // constructor
- *     result = Reflect.getOwnMetadataKeys(Example);
+ * // property (on constructor)
+ * result = Reflect.getOwnMetadataKeys(Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.getOwnMetadataKeys(Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.getOwnMetadataKeys(Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.getOwnMetadataKeys(Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.getOwnMetadataKeys(Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.getOwnMetadataKeys(Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.getOwnMetadataKeys(Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.getOwnMetadataKeys(Example.prototype, "method");
+ * ```
  */
 export function getOwnMetadataKeys(target: any): any[];
 export function getOwnMetadataKeys(target: any, propertyKey: string | symbol): any[];
@@ -486,36 +523,40 @@ export function getOwnMetadataKeys(target: any, propertyKey?: string | symbol): 
 
 /**
  * Deletes the metadata entry from the target object with the provided key.
- * @param metadataKey A key used to store and retrieve metadata.
- * @param target The target object on which the metadata is defined.
- * @param propertyKey (Optional) The property key for the target.
- * @returns `true` if the metadata entry was found and deleted; otherwise, false.
+ *
+ * @param {any} metadataKey - A key used to store and retrieve metadata.
+ * @param {any} target - The target object on which the metadata is defined.
+ * @param {string | symbol} [propertyKey] - (Optional) The property key for the target.
+ *
+ * @returns {boolean} - `true` if the metadata entry was found and deleted; otherwise, false.
+ *
  * @example
+ * ```ts
+ * class Example {
+ *     // property declarations are not part of ES6, though they are valid in TypeScript:
+ *     // static staticProperty;
+ *     // property;
  *
- *     class Example {
- *         // property declarations are not part of ES6, though they are valid in TypeScript:
- *         // static staticProperty;
- *         // property;
+ *     constructor(p) { }
+ *     static staticMethod(p) { }
+ *     method(p) { }
+ * }
  *
- *         constructor(p) { }
- *         static staticMethod(p) { }
- *         method(p) { }
- *     }
+ * // constructor
+ * result = Reflect.deleteMetadata("custom:annotation", Example);
  *
- *     // constructor
- *     result = Reflect.deleteMetadata("custom:annotation", Example);
+ * // property (on constructor)
+ * result = Reflect.deleteMetadata("custom:annotation", Example, "staticProperty");
  *
- *     // property (on constructor)
- *     result = Reflect.deleteMetadata("custom:annotation", Example, "staticProperty");
+ * // property (on prototype)
+ * result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "property");
  *
- *     // property (on prototype)
- *     result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "property");
+ * // method (on constructor)
+ * result = Reflect.deleteMetadata("custom:annotation", Example, "staticMethod");
  *
- *     // method (on constructor)
- *     result = Reflect.deleteMetadata("custom:annotation", Example, "staticMethod");
- *
- *     // method (on prototype)
- *     result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "method");
+ * // method (on prototype)
+ * result = Reflect.deleteMetadata("custom:annotation", Example.prototype, "method");
+ * ```
  */
 export function deleteMetadata(metadataKey: any, target: any): boolean;
 export function deleteMetadata(metadataKey: any, target: any, propertyKey: string | symbol): boolean;

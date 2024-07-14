@@ -6,7 +6,7 @@
 
 **This is a fork of** [jiawei397/deno-reflect-metadata](https://github.com/jiawei397/deno-reflect-metadata)
 
-This is a copy of the
+This includes a copy of the
 [Metadata Reflection API by Microsoft](https://github.com/rbuckton/reflect-metadata)
 with
 [slight changes](https://github.com/cmd-johnson/deno-reflect-metadata/commit/a39666813eb7e8b38fe563f275085b60f044af7e)
