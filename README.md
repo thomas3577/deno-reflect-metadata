@@ -1,4 +1,6 @@
-# Metadata Reflection API for Deno
+# [Deprecated] Metadata Reflection API for Deno
+
+**Please use the original Package `deno add npm:reflect-metadata` (https://www.npmjs.com/package/reflect-metadata).**
 
 [![JSR Version](https://jsr.io/badges/@dx/reflect)](https://jsr.io/@dx/reflect)
 [![JSR Score](https://jsr.io/badges/@dx/reflect/score)](https://jsr.io/@dx/reflect/score)
